@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14838.19" systemVersion="19A487m" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="NO" userDefinedModelVersionIdentifier="">
+    <entity name="Receipt" representedClassName=".Receipt" syncable="YES" codeGenerationType="class">
+        <attribute name="details" attributeType="String"/>
+        <attribute name="image" attributeType="String"/>
+        <attribute name="timestamp" attributeType="Date" defaultDateTimeInterval="583557000" usesScalarValueType="NO"/>
+    </entity>
+    <elements>
+        <element name="Receipt" positionX="-63" positionY="-18" width="128" height="88"/>
+    </elements>
+</model>
