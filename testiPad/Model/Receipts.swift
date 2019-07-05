@@ -8,38 +8,31 @@
 
 import Foundation
 
-enum PassFailResult {
-    
-    case failure
-    
-    case success
-}
-
 final class Receipts: Codable {
     
     var id: Int?
     var details: String
-    var image: String
     var timestamp: String
-
-    init(details: String, image: String, timestamp: String) {
-        self.details = details
-        self.image = image
-        self.timestamp = timestamp
-    }
+    var imageString: String
     
-    func deleteReceipt(id: Int, completion: (PassFailResult) -> Void) {
-        let url = URL(string: "\(BASE_URL)/\(id)")!
-        print(url)
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "DELETE"
-        URLSession.shared.dataTask(with: urlRequest) { (_, response, _) in
-            if let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode == 204 {
-                print(httpResponse.statusCode)
-            } else {
-                print("error")
-            }
-            }.resume()
+    init(details: String, timestamp: String, imageString: String) {
+        self.details = details
+        self.timestamp = timestamp
+        self.imageString = imageString
     }
+
+func deleteReceipt(id: Int?, completion: @escaping (PassFailResult) -> Void) {
+    let url = URL(string: "\(BASE_URL)/\(id)")!
+    print(url)
+    var urlRequest = URLRequest(url: url)
+    urlRequest.httpMethod = "DELETE"
+    URLSession.shared.dataTask(with: urlRequest) { (_, response, _) in
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 204 {
+            print(httpResponse.statusCode)
+            completion(.success)
+        }
+        else { completion(.failure) }
+        }.resume()
 }
+}
+
