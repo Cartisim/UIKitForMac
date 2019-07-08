@@ -20,12 +20,10 @@ let BASE_URL = URL(string: "\(BASE_STRING)receipt/")!
 let IMAGE_URL = URL(string: "\(BASE_STRING)images/")!
 
 class Constants {
-    
+
     static let shared = Constants()
-    
-    fileprivate var _image: Data?
+
     fileprivate var _id: Int = 0
-//        UUID.init()
     
     var id: Int {
         get {
@@ -33,15 +31,6 @@ class Constants {
         }
         set {
             _id = newValue
-        }
-    }
-    
-    var image: Data? {
-        get {
-            return _image
-        }
-        set {
-            _image = newValue
         }
     }
 }

@@ -14,40 +14,52 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate , UINavi
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var image: UIImageView!
     
-    var receipts = [Receipts]()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        #if !targetEnvironment(UIKitForMac)
         chooseImage()
+        #endif
     }
     
-    func addImage(image: Data) {
-        let addImage = Images(image: image, receiptID: Constants.shared.id)
-        let url = URL(string: "\(BASE_URL)users/\(1)/profilePicture")!
+    override func viewWillAppear(_ animated: Bool) {
+        if image.image == nil {
+            image.image = UIImage(named: "example")
+        }
+    }
+
+    func addImage(image: Data, completion: @escaping (Result<Images, Error>) -> ()) {
+        let addImage = Images(image: image)
+        guard let url = URL(string: "\(BASE_URL)users/\(Constants.shared.id)/profilePicture") else { return }
+        guard let uploadData = try? JSONEncoder().encode(addImage) else {
+            return
+        }
         var request = URLRequest(url: url)
-        print(url)
-        print(request)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("keep-alive", forHTTPHeaderField: "Connection")
-        request.httpBody = try? JSONEncoder().encode(addImage)
-        
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let item = try JSONDecoder().decode(Images.self, from: data)
-                DispatchQueue.main.async {
-                    print(item)
-                    Constants.shared.image = item.image
-                }
-            } catch {
-                print("ther was an error adding Images \(error)")
+         URLSession.shared.uploadTask(with: request, from: uploadData) { (data, response, error) in
+            
+            if let error = error {
+                print ("error: \(error)")
+                return
             }
-            }.resume()
+           
+            guard let response = response as? HTTPURLResponse,
+                (200...299).contains(response.statusCode) else {
+                    print ("server error")
+                    return
+            }
+             print(response.statusCode)
+            if let mimeType = response.mimeType,
+                mimeType == "application/json",
+                let data = data,
+                let dataString = String(data: data, encoding: .utf8) {
+                print ("got data: \(dataString)")
+            }
+        }.resume()
     }
     
+    #if !targetEnvironment(UIKitForMac)
     func chooseImage() {
-        image.image = UIImage(named: "example")
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFill
         image.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageSelection)))
@@ -61,6 +73,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate , UINavi
         picker.allowsEditing = true
         present(picker, animated: true)
     }
+    #endif
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
@@ -76,21 +89,19 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate , UINavi
             image.image = selectedImage
         }
         
-        
-        guard let data = selectImage?.jpegData(compressionQuality: 0.1) else { return }
-//        let image : UIImage = UIImage(data: data!)!
-//        let imageData:NSData = image.pngData()! as NSData
-//        let base64 = imageData.base64EncodedData()
-        
-            print(data)
-        
-        addImage(image: data)
+        guard let data = selectImage?.jpegData(compressionQuality: 1.0) else { return }
+        addImage(image: data, completion: { (res) in
+            switch res {
+            case .success(let image):
+                print(image)
+            case .failure(let error):
+                print("There was an error adding image\(error)")
+            }
+        })
         dismiss(animated: true, completion: nil)
-        
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        print("1234")
         dismiss(animated: true, completion: nil)
     }
     

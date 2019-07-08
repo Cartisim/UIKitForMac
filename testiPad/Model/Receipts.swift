@@ -21,8 +21,8 @@ final class Receipts: Codable {
         self.imageString = imageString
     }
 
-func deleteReceipt(id: Int?, completion: @escaping (PassFailResult) -> Void) {
-    let url = URL(string: "\(BASE_URL)/\(id)")!
+func deleteReceipt(id: Int, completion: @escaping (PassFailResult) -> Void) {
+    guard let url = URL(string: "\(BASE_URL)\(String(describing: id))") else { return }
     print(url)
     var urlRequest = URLRequest(url: url)
     urlRequest.httpMethod = "DELETE"

@@ -12,10 +12,8 @@ final class Images: Codable {
     
     var id: Int?
     var image: Data
-    var receiptID: Int
     
-    init(image: Data, receiptID: Int) {
+    init(image: Data) {
         self.image = image
-        self.receiptID = receiptID
     }
 }
