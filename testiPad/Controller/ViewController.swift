@@ -89,7 +89,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate , UINavi
             image.image = selectedImage
         }
         
-        guard let data = selectImage?.jpegData(compressionQuality: 1.0) else { return }
+        guard let data = selectImage?.jpegData(compressionQuality: 0.1) else { return }
         addImage(image: data, completion: { (res) in
             switch res {
             case .success(let image):
